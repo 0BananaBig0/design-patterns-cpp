@@ -18,6 +18,7 @@ set(PATTERNS
     iterator
     mediator
     memento
+    object-pool
     observer
     prototype
     proxy
