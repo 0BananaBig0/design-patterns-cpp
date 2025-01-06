@@ -25,23 +25,21 @@ set(PATTERNS
     state
     strategy
     template-method
-    visitor
-)
+    visitor)
 
 foreach(_dir IN ITEMS ${PATTERNS})
-    file(GLOB _files "${_dir}/*.cpp")
-    message(STATUS "Pattern `${_dir}':")
+  file(GLOB _files "${_dir}/*.cpp")
+  message(STATUS "Pattern `${_dir}':")
 
-    foreach(_file IN ITEMS ${_files})
+  foreach(_file IN ITEMS ${_files})
 
-        get_filename_component(_file_name
-                                ${_file} NAME
-        )
+    get_filename_component(_file_name ${_file} NAME)
+    get_filename_component(_project_name ${_file} NAME_WE)
 
-        set(_project_name "${_file_name}")
-        message(STATUS "  ${_dir}/${_file_name} is going to be built")
-        
-        add_executable(${_project_name} "${_dir}/${_file_name}")
-    endforeach()
-    
+    set(_project_name "${_project_name}.exe")
+    message(STATUS "  ${_dir}/${_file_name} is going to be built")
+
+    add_executable(${_project_name} "${_dir}/${_file_name}")
+  endforeach()
+
 endforeach()
