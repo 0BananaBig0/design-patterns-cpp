@@ -1,107 +1,60 @@
-/*
- * C++ Design Patterns: Flyweight
- * Author: Jakub Vojvoda [github.com/JakubVojvoda]
- * 2016
- *
- * Source code is licensed under MIT License
- * (for more details see LICENSE)
- *
- */
-
 #include <iostream>
-#include <map>
+using namespace std;
 
-/*
- * Flyweight
- * declares an interface through which flyweights can receive
- * and act on extrinsic state
- */
+// The shared part.
 class Flyweight {
    public:
-      virtual ~Flyweight() {}
-
-      virtual void operation() = 0;
-      // ...
-};
-
-/*
- * UnsharedConcreteFlyweight
- * not all subclasses need to be shared
- */
-class UnsharedConcreteFlyweight: public Flyweight {
-   public:
-      UnsharedConcreteFlyweight( const int intrinsic_state ):
-         state( intrinsic_state ) {}
-
-      ~UnsharedConcreteFlyweight() {}
-
-      void operation() {
-         std::cout << "Unshared Flyweight with state " << state << std::endl;
+      explicit Flyweight( int shared_value_one ) {
+         _mSharedValueOne = shared_value_one;
+         cout << "ctor: " << _mSharedValueOne << '\n';
       }
 
-      // ...
+      ~Flyweight() { cout << _mSharedValueOne << ' '; }
 
-   private:
-      int state;
-      // ...
-};
-
-/*
- * ConcreteFlyweight
- * implements the Flyweight interface and adds storage
- * for intrinsic state
- */
-class ConcreteFlyweight: public Flyweight {
-   public:
-      ConcreteFlyweight( const int all_state ): state( all_state ) {}
-
-      ~ConcreteFlyweight() {}
-
-      void operation() {
-         std::cout << "Concrete Flyweight with state " << state << std::endl;
+      void report( int unique_value_two ) {
+         cout << _mSharedValueOne << unique_value_two << ' ';
       }
 
-      // ...
-
    private:
-      int state;
-      // ...
+      int _mSharedValueOne;
 };
 
-/*
- * FlyweightFactory
- * creates and manages flyweight objects and ensures
- * that flyweights are shared properly
- */
-class FlyweightFactory {
+class Factory {
    public:
-      ~FlyweightFactory() {
-         for( auto it = flies.begin(); it != flies.end(); it++ ) {
-            delete it->second;
+      static Flyweight* getFly( int in ) {
+         if( !_sPool[in] ) {
+            _sPool[in] = new Flyweight( in );
          }
-         flies.clear();
+         return _sPool[in];
       }
 
-      Flyweight* getFlyweight( const int key ) {
-         if( flies.find( key ) != flies.end() ) {
-            return flies[key];
+      static void cleanUp() {
+         cout << "dtors: ";
+         for( int i = 0; i < _x; ++i ) {
+            if( _sPool[i] ) {
+               delete _sPool[i];
+            }
          }
-         Flyweight* fly = new ConcreteFlyweight( key );
-         flies.insert( std::pair< int, Flyweight* >( key, fly ) );
-         return fly;
+         cout << '\n';
       }
 
-      // ...
+      static int _x, _y;
 
    private:
-      std::map< int, Flyweight* > flies;
-      // ...
+      static Flyweight* _sPool[];
 };
+
+int Factory::_x = 6, Factory::_y = 10;
+Flyweight* Factory::_sPool[]
+   = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 int main() {
-   FlyweightFactory* factory = new FlyweightFactory;
-   factory->getFlyweight( 1 )->operation();
-   factory->getFlyweight( 2 )->operation();
-   delete factory;
-   return 0;
+   for( int i = 0; i < Factory::_x; ++i ) {
+      for( int j = 0; j < Factory::_y; ++j ) {
+         // The unique part is computed by the client.
+         Factory::getFly( i )->report( j );
+      }
+      cout << '\n';
+   }
+   Factory::cleanUp();
 }
