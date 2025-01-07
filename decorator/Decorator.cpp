@@ -46,7 +46,7 @@ class ConcreteComponent: public Component {
  */
 class Decorator: public Component {
    public:
-      ~Decorator() {}
+      ~Decorator() { delete component; }
 
       Decorator( Component* c ): component( c ) {}
 
@@ -96,8 +96,6 @@ int main() {
    component->operation();
 
    delete da;
-   delete db;
-   delete cc;
 
    return 0;
 }
