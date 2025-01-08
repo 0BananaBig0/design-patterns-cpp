@@ -1,93 +1,75 @@
-/*
- * C++ Design Patterns: Command
- * Author: Jakub Vojvoda [github.com/JakubVojvoda]
- * 2016
- *
- * Source code is licensed under MIT License
- * (for more details see LICENSE)
- *
- */
-
+///////////////////////////////////////////////////////////////////////////
+//  > File Name: Command.cpp
+//  > Author: Huaxiao Liang
+//  > Mail: 1184903633@qq.com
+//  > Created Time: 01/08/2025-Wed-13:02:21
+//  > Modified from: https://sourcemaking.com/design_patterns/command/cpp/2
+///////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <string>
+using namespace std;
 
-/*
- * Receiver
- * knows how to perform the operations associated
- * with carrying out a request
- */
-class Receiver {
-   public:
-      void action() { std::cout << "Receiver: execute action" << std::endl; }
+class Person;
 
-      // ...
-};
-
-/*
- * Command
- * declares an interface for all commands
- */
 class Command {
+      // 1. Create a class that encapsulates an object and a member function
+      // a pointer to a member function (the attribute's name is "_cmdAction")
+      Person* _object;   //
+      void ( Person::*_cmdAction )();
+
    public:
-      virtual ~Command() {}
-
-      virtual void execute() = 0;
-      // ...
-
-   protected:
-      Command() {}
-};
-
-/*
- * Concrete Command
- * implements execute by invoking the corresponding
- * operation(s) on Receiver
- */
-class ConcreteCommand: public Command {
-   public:
-      ConcreteCommand( Receiver* r ): receiver( r ) {}
-
-      ~ConcreteCommand() {
-         if( receiver ) {
-            delete receiver;
-         }
+      explicit Command( Person* obj = nullptr,
+                        void ( Person::*cmd_action )() = nullptr ) {
+         _object = obj;   // the argument's name is "meth"
+         _cmdAction = cmd_action;
       }
 
-      void execute() { receiver->action(); }
-
-      // ...
-
-   private:
-      Receiver* receiver;
-      // ...
+      void execute() {
+         ( _object->*_cmdAction )();   // invoke the _cmdAction on the object
+      }
 };
 
-/*
- * Invoker
- * asks the command to carry out the request
- */
-class Invoker {
-   public:
-      void set( Command* c ) { command = c; }
+class Person {
+      string _name;
 
-      void confirm() {
-         if( command ) {
-            command->execute();
-         }
+      // cmd is a "black box", it is a _cmdAction invocation
+      // promoted to "full object status"
+      Command _cmd;
+
+   public:
+      Person( string n, Command c ): _name( n ), _cmd( c ) {}
+
+      void talk() {
+         // "this" is the sender, cmd has the receiver
+         cout << _name << " is talking" << endl;
+         _cmd.execute();   // ask the "black box" to callback the receiver
       }
 
-      // ...
+      void passOn() {
+         cout << _name << " is passing on" << endl;
 
-   private:
-      Command* command;
-      // ...
+         // 4. When the sender is ready to callback to the receiver,
+         // it calls execute()
+         _cmd.execute();
+      }
+
+      void gossip() {
+         cout << _name << " is gossiping" << endl;
+         _cmd.execute();
+      }
+
+      void listen() { cout << _name << " is listening" << endl; }
 };
 
 int main() {
-   ConcreteCommand command( new Receiver() );
-
-   Invoker invoker;
-   invoker.set( &command );
-   invoker.confirm();
-
-   return 0;
+   // Fred will "execute" Barney which will result in a call to passOn()
+   // Barney will "execute" Betty which will result in a call to gossip()
+   // Betty will "execute" Wilma which will result in a call to listen()
+   Person wilma( "Wilma", Command() );
+   // 2. Instantiate an object for each "callback"
+   // 3. Pass each object to its future "sender"
+   Person betty( "Betty", Command( &wilma, &Person::listen ) );
+   Person barney( "Barney", Command( &betty, &Person::gossip ) );
+   Person fred( "Fred", Command( &barney, &Person::passOn ) );
+   fred.talk();
 }

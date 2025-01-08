@@ -1,3 +1,10 @@
+///////////////////////////////////////////////////////////////////////////
+//  > File Name: Flyweight.cpp
+//  > Author: Huaxiao Liang
+//  > Mail: 1184903633@qq.com
+//  > Created Time: 01/08/2025-Wed-13:01:12
+//  > Modified from: https://sourcemaking.com/design_patterns/flyweight/cpp/1
+///////////////////////////////////////////////////////////////////////////
 #include <iostream>
 using namespace std;
 
