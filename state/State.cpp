@@ -50,11 +50,11 @@ class ConcreteStateB: public State {
  * Context
  * defines the interface of interest to clients
  */
-class Context {
+class Machine {
    public:
-      Context(): state() { /* ... */ }
+      Machine(): state() { /* ... */ }
 
-      ~Context() { delete state; }
+      ~Machine() { delete state; }
 
       void setState( State* const s ) {
          if( state ) {
@@ -73,14 +73,14 @@ class Context {
 };
 
 int main() {
-   Context* context = new Context();
+   Machine* machine = new Machine();
 
-   context->setState( new ConcreteStateA() );
-   context->request();
+   machine->setState( new ConcreteStateA() );
+   machine->request();
 
-   context->setState( new ConcreteStateB() );
-   context->request();
+   machine->setState( new ConcreteStateB() );
+   machine->request();
 
-   delete context;
+   delete machine;
    return 0;
 }
