@@ -14,40 +14,50 @@
  * AbstractClass
  * implements a template method defining the skeleton of an algorithm
  */
-class AbstractClass {
+class TemplateClass {
    public:
-      virtual ~AbstractClass() {}
+      virtual ~TemplateClass() {}
 
-      void templateMethod() {
+      void templateUniqueMethod() {
          // ...
-         primitiveOperation1();
+         criticalStep1();
+         sharedStep1();
          // ...
-         primitiveOperation2();
+         sharedStep2();
+         critialStep2();
          // ...
       }
 
-      virtual void primitiveOperation1() = 0;
-      virtual void primitiveOperation2() = 0;
+      void sharedStep1() {
+         // ...
+      };
+      void sharedStep2() {
+         // ...
+      };
+      // ...
+
+      virtual void criticalStep1() = 0;
+      virtual void critialStep2() = 0;
       // ...
 };
 
 /*
- * Concrete Class
- * implements the primitive operations to carry out specific steps
- * of the algorithm, there may be many Concrete classes, each implementing
- * the full set of the required operation
+ * Concrete Algorithm Class
+ * implements the critical steps of the algorithm,
+ * there may be many Concrete classes, each implementing
+ * the full set of the required steps
  */
-class ConcreteClass: public AbstractClass {
+class ConcreteAlgorithmClass: public TemplateClass {
    public:
-      ~ConcreteClass() {}
+      ~ConcreteAlgorithmClass() {}
 
-      void primitiveOperation1() {
-         std::cout << "Primitive operation 1" << std::endl;
+      void criticalStep1() {
+         std::cout << "Critical step 1" << std::endl;
          // ...
       }
 
-      void primitiveOperation2() {
-         std::cout << "Primitive operation 2" << std::endl;
+      void critialStep2() {
+         std::cout << "Critical step 2" << std::endl;
          // ...
       }
 
@@ -55,8 +65,8 @@ class ConcreteClass: public AbstractClass {
 };
 
 int main() {
-   AbstractClass* tm = new ConcreteClass;
-   tm->templateMethod();
+   TemplateClass* tm = new ConcreteAlgorithmClass;
+   tm->templateUniqueMethod();
 
    delete tm;
    return 0;
